@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 11%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 11%;
+  --card-foreground: 0 0% 100%;
+  --popover: 0 0% 11%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 24 95% 53%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 17%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 0 0% 17%;
+  --muted-foreground: 0 0% 63%;
+  --accent: 0 0% 24%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 17%;
+  --input: 0 0% 24%;
+  --ring: 24 95% 53%;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 0 0% 11%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 11%;
+  --card-foreground: 0 0% 100%;
+  --popover: 0 0% 11%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 24 95% 53%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 17%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 0 0% 17%;
+  --muted-foreground: 0 0% 63%;
+  --accent: 0 0% 24%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 17%;
+  --input: 0 0% 24%;
+  --ring: 24 95% 53%;
+}
+
+/* Base styles */
+* {
+  border-style: solid;
+  border-width: 0;
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.code-editor {
+  font-family: "Menlo", "Monaco", "Courier New", monospace;
+}
+
+.line-number {
+  color: #636363;
+  text-align: right;
+  padding-right: 1rem;
+  user-select: none;
+}
+
+.method-get {
+  color: #61affe;
+}
+
+.method-post {
+  color: #49cc90;
+}
+
+.method-put {
+  color: #fca130;
+}
+
+.method-delete {
+  color: #f93e3e;
+}
+
+.method-patch {
+  color: #50e3c2;
+}
+
+.json-key {
+  color: #f07178;
+}
+
+.json-string {
+  color: #c3e88d;
+}
+
+.json-number {
+  color: #f78c6c;
+}
+
+.json-boolean {
+  color: #c792ea;
+}
+
+.json-null {
+  color: #c792ea;
+}
+

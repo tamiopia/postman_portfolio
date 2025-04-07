@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 
 // This is a simple knowledge base about you
 const KNOWLEDGE_BASE = {
-  name: "Tamagn Beyene",
+  name: "Tamagn Zewdu",
   role: "Backend Developer & API Specialist",
   experience: "Over 2.5 years of experience in building robust APIs and scalable web applications.",
   skills: [

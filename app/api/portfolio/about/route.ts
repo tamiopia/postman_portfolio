@@ -299,13 +299,13 @@ export async function GET() {
     </div>
     
     <div class="social-links">
-      <a href="" class="social-link">
+      <a href="https://github.com/tamiopia" class="social-link">
         <span class="social-icon">🔗</span> GitHub
       </a>
-      <a href="" class="social-link">
+      <a href="https://linkedin.com/in/tamagn-zewdu" class="social-link">
         <span class="social-icon">🔗</span> LinkedIn
       </a>
-      <a href="" class="social-link">
+      <a href="https://medium.com/@tamiopia" class="social-link">
         <span class="social-icon">🔗</span> medium
       </a>
       

@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 const KNOWLEDGE_BASE = {
   name: "Tamagn Beyene",
   role: "Backend Developer & API Specialist",
-  experience: "Over 5 years of experience in building robust APIs and scalable web applications.",
+  experience: "Over 2.5 years of experience in building robust APIs and scalable web applications.",
   skills: [
     "Node.js & Express",
     "Python & Django/Flask",

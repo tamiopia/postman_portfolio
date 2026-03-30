@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useId, useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { ApiResponse } from "./postman-interface"
-import { Loader2, Clock, FileText } from "lucide-react"
+import { ExternalLink, Loader2, Maximize2, Minimize2, Clock, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 type ResponsePanelProps = {
@@ -12,7 +12,8 @@ type ResponsePanelProps = {
 }
 
 export function ResponsePanel({ response, isLoading }: ResponsePanelProps) {
-  const [activeTab, setActiveTab] = useState("body")
+  const [activeTab, setActiveTab] = useState("html")
+  const previewId = useId()
 
   const getStatusColor = (status: number) => {
     if (status >= 200 && status < 300) return "text-green-500"
@@ -22,8 +23,181 @@ export function ResponsePanel({ response, isLoading }: ResponsePanelProps) {
     return "text-gray-500"
   }
 
+  const rawContent = response ? (typeof response.data === "string" ? response.data : JSON.stringify(response.data, null, 2)) : ""
+
+  const escapeHtml = (value: string) =>
+    value
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+
+  const buildPreviewDocument = (content: string, mode: "embedded" | "standalone") => {
+    const origin = typeof window !== "undefined" ? window.location.origin : ""
+    const safeContent = content.trim().startsWith("<")
+      ? content
+      : `<pre>${escapeHtml(content)}</pre>`
+
+    const standaloneControls =
+      mode === "standalone"
+        ? `
+      <div class="standalone-actions">
+        <button type="button" class="nav-button" onclick="window.location.href='${origin}'">Back to Portfolio</button>
+        <button type="button" class="nav-button nav-button-secondary" onclick="window.close()">Close Tab</button>
+      </div>`
+        : ""
+
+    return `
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <base target="_blank" />
+          <style>
+            :root {
+              color-scheme: dark;
+            }
+            * {
+              box-sizing: border-box;
+            }
+            body {
+              background: #000;
+              color: #f1f1f1;
+              font-family: 'Courier New', monospace;
+              margin: 0;
+              line-height: 1.55;
+              padding: ${mode === "standalone" ? "0" : "40px 20px 20px"};
+            }
+            .preview-shell {
+              min-height: 100vh;
+              background: #000;
+            }
+            .preview-nav {
+              position: sticky;
+              top: 0;
+              z-index: 20;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 16px;
+              padding: 14px 18px;
+              border-bottom: 1px solid #252525;
+              background: rgba(12, 12, 12, 0.94);
+              backdrop-filter: blur(10px);
+            }
+            .preview-nav strong {
+              color: #f97316;
+              font-size: 13px;
+              letter-spacing: 0.08em;
+              text-transform: uppercase;
+            }
+            .preview-nav span {
+              color: #8b8b8b;
+              font-size: 12px;
+            }
+            .standalone-actions {
+              display: flex;
+              gap: 10px;
+              flex-wrap: wrap;
+            }
+            .nav-button {
+              border: 1px solid #3a3a3a;
+              background: #f97316;
+              color: #fff;
+              border-radius: 999px;
+              padding: 9px 14px;
+              font-size: 12px;
+              font-weight: 700;
+              cursor: pointer;
+            }
+            .nav-button-secondary {
+              background: #171717;
+              color: #f4f4f5;
+            }
+            .preview-content {
+              padding: 24px 20px 28px;
+            }
+            pre {
+              white-space: pre-wrap;
+              word-wrap: break-word;
+              margin: 0;
+            }
+            .terminal-prompt::before {
+              content: "$ ";
+              color: #f97316;
+              font-weight: bold;
+            }
+            .terminal-prompt {
+              margin-bottom: 10px;
+              display: block;
+            }
+            .response-content {
+              padding-left: 15px;
+              border-left: 2px solid #333;
+            }
+            .comment {
+              color: #666;
+              font-style: italic;
+            }
+            a {
+              color: #fb923c !important;
+              text-decoration: underline;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="preview-shell">
+            ${
+              mode === "standalone"
+                ? `<div class="preview-nav"><div><strong>Response Preview</strong><br /><span>External links open normally and you can return to the workspace anytime.</span></div>${standaloneControls}</div>`
+                : ""
+            }
+            <div class="preview-content">
+              <span class="terminal-prompt">fetch response</span>
+              <div class="response-content">${safeContent}</div>
+              <span class="terminal-prompt comment">// Backend response received</span>
+            </div>
+          </div>
+          <script>
+            document.querySelectorAll('a[href]').forEach((link) => {
+              link.setAttribute('target', '_blank');
+              link.setAttribute('rel', 'noopener noreferrer');
+            });
+          </script>
+        </body>
+      </html>
+    `
+  }
+
+  const openInNewTab = () => {
+    if (!response) return
+
+    const newWindow = window.open("", "_blank")
+    if (newWindow) {
+      newWindow.opener = null
+      newWindow.document.open()
+      newWindow.document.write(buildPreviewDocument(rawContent, "standalone"))
+      newWindow.document.close()
+    }
+  }
+
+  const toggleFullscreen = async () => {
+    const container = document.getElementById(previewId)
+    if (!container) return
+
+    if (document.fullscreenElement) {
+      await document.exitFullscreen()
+      return
+    }
+
+    if (container.requestFullscreen) {
+      await container.requestFullscreen()
+    }
+  }
+
   return (
-    <div className="flex-1 flex flex-col bg-[#1c1c1c] overflow-hidden">
+    <div id="response-panel" className="flex-1 flex flex-col bg-[#1c1c1c] overflow-hidden">
       <div className="border-b border-[#2c2c2c] p-2 flex items-center">
         <h3 className="text-sm font-medium">Response</h3>
         {response && (
@@ -84,38 +258,28 @@ export function ResponsePanel({ response, isLoading }: ResponsePanelProps) {
           </TabsContent>
 
           <TabsContent value="html" className="flex-1 overflow-auto p-0 m-0">
-            <div className="p-0 h-full bg-black relative">
+            <div id={previewId} className="p-0 h-full bg-black relative">
               <div className="absolute top-2 right-2 z-10 flex gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   className="bg-[#1c1c1c] text-orange-500 border-[#3c3c3c] hover:bg-[#2c2c2c]"
-                  onClick={() => {
-                    // Open in new tab/window
-                    const newWindow = window.open("", "_blank")
-                    if (newWindow) {
-                      const content = typeof response.data === "string" ? response.data : JSON.stringify(response.data)
-                      newWindow.document.write(content)
-                      newWindow.document.close()
-                    }
-                  }}
+                  onClick={openInNewTab}
                 >
+                  <ExternalLink className="mr-1 h-4 w-4" />
                   Open in New Tab
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   className="bg-[#1c1c1c] text-orange-500 border-[#3c3c3c] hover:bg-[#2c2c2c]"
-                  onClick={() => {
-                    // Request fullscreen on the iframe
-                    const iframe = document.getElementById("response-iframe") as HTMLIFrameElement
-                    if (iframe) {
-                      if (iframe.requestFullscreen) {
-                        iframe.requestFullscreen()
-                      }
-                    }
-                  }}
+                  onClick={toggleFullscreen}
                 >
+                  {typeof document !== "undefined" && document.fullscreenElement ? (
+                    <Minimize2 className="mr-1 h-4 w-4" />
+                  ) : (
+                    <Maximize2 className="mr-1 h-4 w-4" />
+                  )}
                   Fullscreen
                 </Button>
               </div>
@@ -126,61 +290,14 @@ export function ResponsePanel({ response, isLoading }: ResponsePanelProps) {
                   <div className="w-3 h-3 rounded-full bg-green-500"></div>
                 </div>
                 <div className="ml-4 text-xs text-gray-400">response-terminal</div>
+                <div className="ml-auto text-[11px] text-gray-500">Use Esc to exit fullscreen</div>
               </div>
               <iframe
                 id="response-iframe"
-                srcDoc={`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <style>
-              body {
-                background-color: #000;
-                color: #f1f1f1;
-                font-family: 'Courier New', monospace;
-                padding: 40px 20px 20px;
-                margin: 0;
-                line-height: 1.5;
-              }
-              pre {
-                white-space: pre-wrap;
-                word-wrap: break-word;
-              }
-              .terminal-prompt:before {
-                content: "$ ";
-                color: #f97316;
-                font-weight: bold;
-              }
-              .terminal-prompt {
-                margin-bottom: 10px;
-                display: block;
-              }
-              .response-content {
-                padding-left: 15px;
-                border-left: 2px solid #333;
-              }
-              .highlight {
-                color: #f97316;
-                font-weight: bold;
-              }
-              .comment {
-                color: #666;
-                font-style: italic;
-              }
-            </style>
-          </head>
-          <body>
-            <span class="terminal-prompt">fetch response</span>
-            <div class="response-content">
-              ${typeof response.data === "string" ? response.data : JSON.stringify(response.data, null, 2)}
-            </div>
-            <span class="terminal-prompt comment">// Backend response received</span>
-          </body>
-        </html>
-      `}
+                srcDoc={buildPreviewDocument(rawContent, "embedded")}
                 className="w-full h-full border-0 pt-8"
                 title="HTML Response"
-                sandbox="allow-same-origin allow-scripts"
+                sandbox="allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation"
               />
             </div>
           </TabsContent>
@@ -222,4 +339,3 @@ export function ResponsePanel({ response, isLoading }: ResponsePanelProps) {
     </div>
   )
 }
-

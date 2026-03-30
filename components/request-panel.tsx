@@ -3,12 +3,15 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Send, Plus, Trash, ChevronDown } from "lucide-react"
+import { Send, Plus, Trash, ChevronDown, ShieldCheck, PlaySquare, FlaskConical, SlidersHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
+import { Badge } from "@/components/ui/badge"
 import type { RequestConfig } from "./postman-interface"
 import { cn } from "@/lib/utils"
 
@@ -21,6 +24,32 @@ type RequestPanelProps = {
 
 export function RequestPanel({ config, onConfigChange, onSend, isLoading }: RequestPanelProps) {
   const [activeTab, setActiveTab] = useState("body")
+  const [authType, setAuthType] = useState<"none" | "bearer" | "basic" | "apikey">("bearer")
+  const [authToken, setAuthToken] = useState("demo-portfolio-token")
+  const [basicUsername, setBasicUsername] = useState("tamagn")
+  const [basicPassword, setBasicPassword] = useState("secure-password")
+  const [apiKey, setApiKey] = useState("portfolio-api-key")
+  const [apiKeyHeader, setApiKeyHeader] = useState("x-api-key")
+  const [preRequestScript, setPreRequestScript] = useState(
+    `const startedAt = new Date().toISOString();
+pm.environment.set("request_started_at", startedAt);
+console.log("Preparing request for:", pm.request.url.toString());`,
+  )
+  const [testScript, setTestScript] = useState(
+    `pm.test("Status code is successful", function () {
+  pm.expect(pm.response.code).to.be.oneOf([200, 201]);
+});
+
+pm.test("Response time stays under 1000ms", function () {
+  pm.expect(pm.response.responseTime).to.be.below(1000);
+});`,
+  )
+  const [requestSettings, setRequestSettings] = useState({
+    followRedirects: true,
+    validateSsl: true,
+    encodeUrlAutomatically: true,
+    retainHeadersOnRedirect: false,
+  })
 
   const handleMethodChange = (value: string) => {
     onConfigChange({ ...config, method: value })
@@ -72,6 +101,46 @@ export function RequestPanel({ config, onConfigChange, onSend, isLoading }: Requ
     onConfigChange({ ...config, body: e.target.value })
   }
 
+  const upsertHeader = (key: string, value: string) => {
+    const nextHeaders = config.headers.filter((header) => header.key.toLowerCase() !== key.toLowerCase())
+    if (value) {
+      nextHeaders.push({ key, value })
+    }
+    onConfigChange({ ...config, headers: nextHeaders })
+  }
+
+  const applyAuthorization = () => {
+    if (authType === "none") {
+      const cleanedHeaders = config.headers.filter(
+        (header) => !["authorization", apiKeyHeader.toLowerCase()].includes(header.key.toLowerCase()),
+      )
+      onConfigChange({ ...config, headers: cleanedHeaders })
+      return
+    }
+
+    if (authType === "bearer") {
+      upsertHeader("Authorization", `Bearer ${authToken}`)
+      return
+    }
+
+    if (authType === "basic") {
+      const encoded = typeof window !== "undefined" ? window.btoa(`${basicUsername}:${basicPassword}`) : ""
+      upsertHeader("Authorization", `Basic ${encoded}`)
+      return
+    }
+
+    if (authType === "apikey") {
+      upsertHeader(apiKeyHeader, apiKey)
+    }
+  }
+
+  const toggleSetting = (key: keyof typeof requestSettings) => {
+    setRequestSettings((current) => ({
+      ...current,
+      [key]: !current[key],
+    }))
+  }
+
   const getMethodColor = (method: string) => {
     switch (method) {
       case "GET":
@@ -90,7 +159,7 @@ export function RequestPanel({ config, onConfigChange, onSend, isLoading }: Requ
   }
 
   return (
-    <div className="flex flex-col">
+    <div id="request-panel" className="flex flex-col">
       {/* URL Bar */}
       <div className="flex items-center p-2 border-b border-[#2c2c2c] bg-[#1c1c1c]">
         <div className="flex items-center mr-2">
@@ -124,6 +193,7 @@ export function RequestPanel({ config, onConfigChange, onSend, isLoading }: Requ
           className="flex-1 h-9 bg-[#2c2c2c] border-[#3c3c3c]"
         />
         <Button
+          id="send-button"
           onClick={() => onSend(config)}
           disabled={isLoading || !config.url}
           className="ml-2 bg-orange-600 hover:bg-orange-700 text-white"
@@ -274,7 +344,7 @@ export function RequestPanel({ config, onConfigChange, onSend, isLoading }: Requ
                       <span>x-www-form-urlencoded</span>
                     </label>
                     <label className="flex items-center space-x-2 text-sm">
-                      <input type="radio" name="body-type" checked className="accent-orange-500" />
+                      <input type="radio" name="body-type" defaultChecked className="accent-orange-500" />
                       <span>raw</span>
                     </label>
                     <label className="flex items-center space-x-2 text-sm">
@@ -309,26 +379,187 @@ export function RequestPanel({ config, onConfigChange, onSend, isLoading }: Requ
               </TabsContent>
 
               <TabsContent value="authorization" className="p-4 mt-0">
-                <div className="text-center text-gray-400 py-8">
-                  <p>Authorization settings would go here</p>
+                <div className="rounded-lg border border-[#2c2c2c] bg-[#171717] p-4">
+                  <div className="mb-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck className="h-4 w-4 text-orange-500" />
+                      <h4 className="text-sm font-medium text-white">Authorization</h4>
+                    </div>
+                    <Badge variant="outline" className="border-[#3c3c3c] text-gray-300">
+                      Applied to headers
+                    </Badge>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-gray-300">Type</Label>
+                      <Select value={authType} onValueChange={(value: "none" | "bearer" | "basic" | "apikey") => setAuthType(value)}>
+                        <SelectTrigger className="bg-[#2c2c2c] border-[#3c3c3c]">
+                          <SelectValue placeholder="Select auth type" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#2c2c2c] border-[#3c3c3c]">
+                          <SelectItem value="none">No Auth</SelectItem>
+                          <SelectItem value="bearer">Bearer Token</SelectItem>
+                          <SelectItem value="basic">Basic Auth</SelectItem>
+                          <SelectItem value="apikey">API Key</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {authType === "bearer" && (
+                      <div className="space-y-2">
+                        <Label className="text-gray-300">Token</Label>
+                        <Input
+                          value={authToken}
+                          onChange={(e) => setAuthToken(e.target.value)}
+                          className="bg-[#2c2c2c] border-[#3c3c3c]"
+                          placeholder="Enter bearer token"
+                        />
+                      </div>
+                    )}
+
+                    {authType === "basic" && (
+                      <div className="grid gap-3 md:grid-cols-2">
+                        <div className="space-y-2">
+                          <Label className="text-gray-300">Username</Label>
+                          <Input
+                            value={basicUsername}
+                            onChange={(e) => setBasicUsername(e.target.value)}
+                            className="bg-[#2c2c2c] border-[#3c3c3c]"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-gray-300">Password</Label>
+                          <Input
+                            value={basicPassword}
+                            onChange={(e) => setBasicPassword(e.target.value)}
+                            className="bg-[#2c2c2c] border-[#3c3c3c]"
+                            type="password"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {authType === "apikey" && (
+                      <div className="grid gap-3 md:grid-cols-2">
+                        <div className="space-y-2">
+                          <Label className="text-gray-300">Header Name</Label>
+                          <Input
+                            value={apiKeyHeader}
+                            onChange={(e) => setApiKeyHeader(e.target.value)}
+                            className="bg-[#2c2c2c] border-[#3c3c3c]"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-gray-300">API Key</Label>
+                          <Input
+                            value={apiKey}
+                            onChange={(e) => setApiKey(e.target.value)}
+                            className="bg-[#2c2c2c] border-[#3c3c3c]"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex flex-wrap items-center gap-3">
+                      <Button onClick={applyAuthorization} className="bg-orange-600 hover:bg-orange-700 text-white">
+                        Apply Authorization
+                      </Button>
+                      <span className="text-xs text-gray-400">
+                        This updates the request headers so the request is closer to a real Postman flow.
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </TabsContent>
 
               <TabsContent value="scripts" className="p-4 mt-0">
-                <div className="text-center text-gray-400 py-8">
-                  <p>Pre-request scripts would go here</p>
+                <div className="rounded-lg border border-[#2c2c2c] bg-[#171717] overflow-hidden">
+                  <div className="flex items-center justify-between border-b border-[#2c2c2c] px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <PlaySquare className="h-4 w-4 text-orange-500" />
+                      <h4 className="text-sm font-medium text-white">Pre-request Script</h4>
+                    </div>
+                    <Badge variant="outline" className="border-[#3c3c3c] text-gray-300">
+                      Workspace draft
+                    </Badge>
+                  </div>
+                  <Textarea
+                    value={preRequestScript}
+                    onChange={(e) => setPreRequestScript(e.target.value)}
+                    className="min-h-[220px] rounded-none border-0 bg-[#111111] font-mono text-sm text-gray-200"
+                  />
+                  <div className="border-t border-[#2c2c2c] px-4 py-3 text-xs text-gray-400">
+                    Use this area for tokens, environment variables, timestamps, or any setup logic before sending a request.
+                  </div>
                 </div>
               </TabsContent>
 
               <TabsContent value="tests" className="p-4 mt-0">
-                <div className="text-center text-gray-400 py-8">
-                  <p>Test scripts would go here</p>
+                <div className="rounded-lg border border-[#2c2c2c] bg-[#171717] overflow-hidden">
+                  <div className="flex items-center justify-between border-b border-[#2c2c2c] px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <FlaskConical className="h-4 w-4 text-orange-500" />
+                      <h4 className="text-sm font-medium text-white">Tests</h4>
+                    </div>
+                    <Badge variant="outline" className="border-[#3c3c3c] text-gray-300">
+                      Post-response checks
+                    </Badge>
+                  </div>
+                  <Textarea
+                    value={testScript}
+                    onChange={(e) => setTestScript(e.target.value)}
+                    className="min-h-[220px] rounded-none border-0 bg-[#111111] font-mono text-sm text-gray-200"
+                  />
+                  <div className="border-t border-[#2c2c2c] px-4 py-3 text-xs text-gray-400">
+                    Add validation logic here for status codes, response time, JSON structure, or contract checks.
+                  </div>
                 </div>
               </TabsContent>
 
               <TabsContent value="settings" className="p-4 mt-0">
-                <div className="text-center text-gray-400 py-8">
-                  <p>Request settings would go here</p>
+                <div className="rounded-lg border border-[#2c2c2c] bg-[#171717] p-4">
+                  <div className="mb-4 flex items-center gap-2">
+                    <SlidersHorizontal className="h-4 w-4 text-orange-500" />
+                    <h4 className="text-sm font-medium text-white">Request Settings</h4>
+                  </div>
+                  <div className="space-y-4">
+                    {[
+                      {
+                        key: "followRedirects" as const,
+                        title: "Automatically follow redirects",
+                        description: "Useful when testing endpoints that return 301 or 302 responses.",
+                      },
+                      {
+                        key: "validateSsl" as const,
+                        title: "SSL certificate verification",
+                        description: "Keep HTTPS checks enabled for a more realistic production request flow.",
+                      },
+                      {
+                        key: "encodeUrlAutomatically" as const,
+                        title: "Encode URL automatically",
+                        description: "Helps prevent malformed requests when parameters contain special characters.",
+                      },
+                      {
+                        key: "retainHeadersOnRedirect" as const,
+                        title: "Retain headers on redirect",
+                        description: "Keeps custom headers attached when requests move through redirects.",
+                      },
+                    ].map((setting) => (
+                      <div
+                        key={setting.key}
+                        className="flex items-start justify-between gap-4 rounded-lg border border-[#2c2c2c] bg-[#111111] p-4"
+                      >
+                        <div>
+                          <Label className="text-sm text-white">{setting.title}</Label>
+                          <p className="mt-1 text-xs text-gray-400">{setting.description}</p>
+                        </div>
+                        <Switch
+                          checked={requestSettings[setting.key]}
+                          onCheckedChange={() => toggleSetting(setting.key)}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </TabsContent>
             </div>

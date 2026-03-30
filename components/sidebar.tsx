@@ -267,7 +267,7 @@ export function Sidebar({ onSelectRequest }: SidebarProps) {
   }
 
   return (
-    <div className="h-full p-0 overflow-y-auto flex flex-col">
+    <div id="sidebar-panel" className="h-full p-0 overflow-y-auto flex flex-col">
       <div className="flex items-center justify-between p-3 border-b border-[#2c2c2c]">
         <span className="text-sm font-medium">Collections</span>
       </div>

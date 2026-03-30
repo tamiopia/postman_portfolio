@@ -8,6 +8,8 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "./ui/resiz
 import { ChevronLeft, ChevronRight, Home, Plus, Search, Settings, X } from "lucide-react"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
+import { ProductTour } from "./product-tour"
+import { PortfolioModeToggle } from "./portfolio-mode-toggle"
 
 export type ApiResponse = {
   status: number
@@ -31,19 +33,11 @@ export function PostmanInterface() {
   const [response, setResponse] = useState<ApiResponse | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [activeRequest, setActiveRequest] = useState<RequestConfig>({
-    method: "POST",
-    url: "http://localhost:8000/api/auth/register",
-    headers: [{ key: "Content-Type", value: "application/json" }],
+    method: "GET",
+    url: "/api/portfolio/about",
+    headers: [],
     params: [],
-    body: JSON.stringify(
-      {
-        username: "tamiopia",
-        email: "tamiopia@gmail.com",
-        password: "**",
-      },
-      null,
-      2,
-    ),
+    body: "",
   })
 
   // Update the tab state to include the request configuration for each tab
@@ -58,23 +52,15 @@ export function PostmanInterface() {
   >([
     {
       id: "tab-1",
-      method: "POST",
-      name: "New Request",
+      method: "GET",
+      name: "About Me",
       active: true,
       requestConfig: {
-        method: "POST",
-        url: "http://localhost:8000/api/auth/register",
-        headers: [{ key: "Content-Type", value: "application/json" }],
+        method: "GET",
+        url: "/api/portfolio/about",
+        headers: [],
         params: [],
-        body: JSON.stringify(
-          {
-            username: "tamiopia",
-            email: "tamiopia@gmail.com",
-            password: "**",
-          },
-          null,
-          2,
-        ),
+        body: "",
       },
     },
     {
@@ -133,7 +119,7 @@ export function PostmanInterface() {
       const startTime = performance.now()
 
       // Build URL with query parameters
-      let finalUrl
+      let finalUrl: URL
       try {
         // Check if the URL is absolute or relative
         if (config.url.startsWith("http://") || config.url.startsWith("https://")) {
@@ -223,6 +209,7 @@ export function PostmanInterface() {
 
   return (
     <div className="h-screen flex flex-col bg-[#1c1c1c] text-white">
+      <ProductTour />
       {/* Top Navigation Bar */}
       <header className="h-12 border-b border-[#2c2c2c] flex items-center px-4 bg-[#1c1c1c]">
         <div className="flex items-center space-x-2">
@@ -252,6 +239,7 @@ export function PostmanInterface() {
           <Button variant="ghost" size="icon" className="h-8 w-8">
             <Settings className="h-4 w-4" />
           </Button>
+          <PortfolioModeToggle mode="api" className="hidden lg:inline-flex" />
           <Button className="bg-orange-600 hover:bg-orange-700 text-white">Contact Me</Button>
         </div>
       </header>
@@ -323,32 +311,35 @@ export function PostmanInterface() {
         </ResizablePanel>
         <ResizableHandle withHandle className="bg-[#2c2c2c] w-1" />
         <ResizablePanel defaultSize={80}>
-          <div className="h-full flex flex-col">
-            {/* Update the onConfigChange handler in the RequestPanel component call to save changes to the active tab */}
-            <RequestPanel
-              config={activeRequest}
-              onConfigChange={(updatedConfig) => {
-                setActiveRequest(updatedConfig)
+          <ResizablePanelGroup direction="vertical" className="h-full">
+            <ResizablePanel defaultSize={50} minSize={20} className="flex flex-col">
+              <RequestPanel
+                config={activeRequest}
+                onConfigChange={(updatedConfig) => {
+                  setActiveRequest(updatedConfig)
 
-                // Update the active tab's request configuration
-                setTabs((currentTabs) =>
-                  currentTabs.map((tab) =>
-                    tab.active
-                      ? {
-                          ...tab,
-                          method: updatedConfig.method, // Update the tab's method display
-                          requestConfig: updatedConfig,
-                        }
-                      : tab,
-                  ),
-                )
-              }}
-              onSend={handleSendRequest}
-              isLoading={isLoading}
-            />
+                  // Update the active tab's request configuration
+                  setTabs((currentTabs) =>
+                    currentTabs.map((tab) =>
+                      tab.active
+                        ? {
+                            ...tab,
+                            method: updatedConfig.method, // Update the tab's method display
+                            requestConfig: updatedConfig,
+                          }
+                        : tab,
+                    ),
+                  )
+                }}
+                onSend={handleSendRequest}
+                isLoading={isLoading}
+              />
+            </ResizablePanel>
             <ResizableHandle withHandle className="bg-[#2c2c2c] h-1" />
-            <ResponsePanel response={response} isLoading={isLoading} />
-          </div>
+            <ResizablePanel defaultSize={50} minSize={20} className="flex flex-col">
+              <ResponsePanel response={response} isLoading={isLoading} />
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>

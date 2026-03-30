@@ -47,7 +47,6 @@
   --ring: 24 95% 53%;
 }
 
-/* Base styles */
 * {
   border-style: solid;
   border-width: 0;
@@ -109,3 +108,67 @@ body {
   color: #c792ea;
 }
 
+.tour-tooltip-card {
+  animation: tour-tooltip-enter 360ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tour-tooltip-content {
+  text-wrap: pretty;
+}
+
+.tour-replay-button {
+  animation: tour-replay-enter 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tour-replay-ping {
+  animation: tour-ping 2.4s ease-out infinite;
+}
+
+@keyframes tour-tooltip-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes tour-replay-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tour-ping {
+  0% {
+    opacity: 0.75;
+    transform: scale(0.92);
+  }
+
+  70% {
+    opacity: 0;
+    transform: scale(1.55);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.55);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour-tooltip-card,
+  .tour-replay-button,
+  .tour-replay-ping {
+    animation: none;
+  }
+}

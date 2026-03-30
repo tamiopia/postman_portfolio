@@ -6,41 +6,52 @@ import { NextResponse } from "next/server"
 
 // Knowledge base about you (same as before)
 const KNOWLEDGE_BASE = {
-  name: "Tamagn zewdu",
-  role: "Backend Developer & API Specialist",
-  experience: "Over 2.5 years of experience in building robust APIs and scalable web applications.",
+  name: "Tamagn Zewdu",
+  role: "Backend Developer, Full-Stack Engineer & API Specialist",
+  experience: "Over 3.5 years of experience building robust APIs, scalable web applications, and backend systems.",
   skills: [
-    "Node.js & Express",
-    "Python & Django/Flask",
+    "Node.js, Express, and NestJS",
+    "Python and Django",
+    "Laravel and PHP",
+    "Next.js and React",
     "RESTful API Design",
-    "GraphQL",
-    "Database Design (SQL & NoSQL)",
-    "Microservices Architecture",
-    "Docker & Kubernetes",
-    "AWS/Azure/GCP",
+    "PostgreSQL, MySQL, and MongoDB",
+    "Microservices and backend architecture",
+    "Developer tools and open-source packages",
   ],
   education: [
-    "Master of Science in Computer Science, University of Technology",
-    "Bachelor of Science in Computer Engineering, National Institute of Technology",
+    "BSc in Software Engineering, Arba Minch University (2019-2024)",
+    "ALX Africa Software Engineering Program (2023-2024)",
   ],
   projects: [
-    "E-Commerce API - A comprehensive RESTful API for e-commerce platforms",
-    "Task Manager API - A task management API with features like task creation and assignment",
-    "Real-time Chat API - A WebSocket-based API for real-time chat applications",
-    "CMS API - A flexible content management system API",
-    "Payment Gateway Integration - A secure payment processing API",
-    "API Gateway Service - A microservice gateway for distributed systems",
+    "Remotide - AI-powered talent matching platform",
+    "SchemaDraw - JSON schema to ERD builder",
+    "Postflame - CLI tool for generating Postman collections from Hono apps",
+    "Nexus - Reputation and sentiment analytics platform",
+    "Qinash Delivery Tracking - Real-time logistics system and dashboard",
+    "Qen.js - Ethiopian calendar conversion package",
   ],
   interests: [
-    "Exploring new technologies",
-    "Contributing to open-source projects",
-    "Hiking and outdoor activities",
-    "Technical blogging",
+    "Participating in and creating open-source projects",
+    "Building developer productivity tools",
+    "Backend architecture and AI workflows",
+    "Mentoring developers",
+  ],
+  companies: [
+    "Ellatech",
+    "Ideeza",
+    "BlueClerk",
+    "Omishtu-JTS",
+    "Qinash Technologies",
+    "Backos Technology",
+    "Xencotech",
+    "Highlight Software / Remotide",
   ],
   contact: {
-    email: "tamagn@example.com",
-    github: "github.com/yourusername",
-    linkedin: "linkedin.com/in/yourusername",
+    website: "https://tamiopia.vercel.app",
+    github: "github.com/tamiopia",
+    linkedin: "linkedin.com/in/tamagn-zewdu",
+    medium: "medium.com/@tamiopia",
   },
 }
 
@@ -95,7 +106,7 @@ export async function POST(request: Request) {
     ) {
       response = `Tamagn's key skills include: ${KNOWLEDGE_BASE.skills.join(", ")}.`
     } else if (userMessageLower.includes("experience") || userMessageLower.includes("work")) {
-      response = `Tamagn has ${KNOWLEDGE_BASE.experience} He has worked on various projects including API development, microservices architecture, and cloud infrastructure.`
+      response = `Tamagn has ${KNOWLEDGE_BASE.experience} He has recently worked with ${KNOWLEDGE_BASE.companies.slice(0, 5).join(", ")}, focusing on APIs, backend architecture, logistics systems, AI workflows, and SaaS platforms.`
     } else if (
       userMessageLower.includes("education") ||
       userMessageLower.includes("study") ||
@@ -115,7 +126,7 @@ export async function POST(request: Request) {
       userMessageLower.includes("email") ||
       userMessageLower.includes("reach")
     ) {
-      response = `You can contact Tamagn via email at ${KNOWLEDGE_BASE.contact.email}, or connect with him on GitHub (${KNOWLEDGE_BASE.contact.github}) and LinkedIn (${KNOWLEDGE_BASE.contact.linkedin}).`
+      response = `You can reach Tamagn through his website (${KNOWLEDGE_BASE.contact.website}), GitHub (${KNOWLEDGE_BASE.contact.github}), LinkedIn (${KNOWLEDGE_BASE.contact.linkedin}), or Medium (${KNOWLEDGE_BASE.contact.medium}).`
     } else if (
       userMessageLower.includes("hello") ||
       userMessageLower.includes("hi") ||

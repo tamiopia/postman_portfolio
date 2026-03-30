@@ -243,7 +243,7 @@ export async function GET() {
           <div class="skill-details">
             Expert-level proficiency in modern JavaScript (ES6+), including async/await, promises, and functional programming concepts.
           </div>
-          <div class="experience-tag">5+ years</div>
+          <div class="experience-tag">3.5+ years</div>
         </div>
         
         <div class="skill-card">
@@ -350,7 +350,7 @@ export async function GET() {
           <div class="skill-details">
             Expert in building scalable server-side applications with Node.js, including REST APIs, microservices, and real-time applications.
           </div>
-          <div class="experience-tag">2.5+ years</div>
+          <div class="experience-tag">3.5+ years</div>
         </div>
         
         <div class="skill-card">
@@ -366,7 +366,7 @@ export async function GET() {
           <div class="skill-details">
             Extensive experience with Express.js for building web applications and APIs with middleware patterns.
           </div>
-          <div class="experience-tag">2.5+ years</div>
+          <div class="experience-tag">3.5+ years</div>
         </div>
         
         <div class="skill-card">
@@ -398,7 +398,7 @@ export async function GET() {
   <div class="skill-details">
     Expert-level Laravel developer with extensive experience building robust web applications, RESTful APIs, and enterprise solutions using Laravel's ecosystem.
   </div>
-  <div class="experience-tag">1.5+ years</div>
+  <div class="experience-tag">2+ years</div>
 </div>
 <div class="skill-card">
   <div class="skill-header">
@@ -451,7 +451,7 @@ export async function GET() {
           <div class="skill-details">
             Expert in MongoDB for document-based storage, including complex aggregations, indexing, and performance optimization.
           </div>
-          <div class="experience-tag">2.5+ years</div>
+          <div class="experience-tag">3+ years</div>
         </div>
         
         <div class="skill-card">

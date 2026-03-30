@@ -1,21 +1,25 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { PortfolioModeToggle } from "@/components/portfolio-mode-toggle"
 
 export default function AboutPage() {
   return (
     <div className="container mx-auto py-10 px-4">
       <div className="max-w-3xl mx-auto">
+        <div className="mb-6 flex justify-end">
+          <PortfolioModeToggle mode="classic" />
+        </div>
         <h1 className="text-4xl font-bold mb-6">About Me</h1>
 
         <div className="mb-8">
           <p className="text-lg mb-4">
-            I'm a passionate backend developer with expertise in building robust APIs, microservices, and scalable
-            systems. With over 5 years of experience, I specialize in Node.js, Python, and cloud infrastructure.
+            I'm a backend-focused full-stack developer with 3.5 years of experience building APIs, scalable web
+            applications, internal tools, and product backends across local and international teams.
           </p>
           <p className="text-lg mb-4">
-            My portfolio is designed as a Postman-like interface to showcase my backend development skills in an
-            interactive way. Feel free to explore the different API endpoints and see the responses in real-time.
+            My portfolio is designed as a Postman-like interface so visitors can explore my experience, projects, and
+            technical strengths in a way that feels interactive and product-oriented.
           </p>
         </div>
 
@@ -28,13 +32,13 @@ export default function AboutPage() {
             <CardContent>
               <ul className="list-disc pl-5 space-y-1">
                 <li>Node.js & Express</li>
-                <li>Python & Django/Flask</li>
+                <li>Python & Django</li>
+                <li>Laravel & PHP</li>
+                <li>Next.js & React</li>
                 <li>RESTful API Design</li>
-                <li>GraphQL</li>
                 <li>Database Design (SQL & NoSQL)</li>
                 <li>Microservices Architecture</li>
-                <li>Docker & Kubernetes</li>
-                <li>AWS/Azure/GCP</li>
+                <li>Developer Tools & Open Source</li>
               </ul>
             </CardContent>
           </Card>
@@ -47,25 +51,28 @@ export default function AboutPage() {
             <CardContent>
               <div className="space-y-4">
                 <div>
+                  <h3 className="font-medium">Lead Senior Full-Stack Developer</h3>
+                  <p className="text-sm text-muted-foreground">BlueClerk (2025-Present)</p>
+                </div>
+                <div>
                   <h3 className="font-medium">Senior Backend Developer</h3>
-                  <p className="text-sm text-muted-foreground">TechCorp Inc. (2020-Present)</p>
+                  <p className="text-sm text-muted-foreground">Ideeza (2025-Present)</p>
                 </div>
                 <div>
                   <h3 className="font-medium">Backend Developer</h3>
-                  <p className="text-sm text-muted-foreground">API Solutions Ltd. (2018-2020)</p>
-                </div>
-                <div>
-                  <h3 className="font-medium">Junior Developer</h3>
-                  <p className="text-sm text-muted-foreground">WebTech Startup (2016-2018)</p>
+                  <p className="text-sm text-muted-foreground">Ellatech (2025-Present)</p>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-3">
           <Button asChild>
             <Link href="/">Back to API Explorer</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/portfolio">Back to Classic Portfolio</Link>
           </Button>
         </div>
       </div>

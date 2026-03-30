@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Github, Linkedin, Mail, Send } from "lucide-react"
 import Link from "next/link"
+import { PortfolioModeToggle } from "@/components/portfolio-mode-toggle"
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -43,6 +44,9 @@ export default function ContactPage() {
     <div className="min-h-screen bg-[#121212] text-white">
       <div className="container mx-auto py-10 px-4">
         <div className="max-w-3xl mx-auto">
+          <div className="mb-6 flex justify-end">
+            <PortfolioModeToggle mode="classic" />
+          </div>
           <h1 className="text-4xl font-bold mb-6 text-center">Contact Me</h1>
 
           <div className="grid gap-8 md:grid-cols-2">
@@ -127,25 +131,25 @@ export default function ContactPage() {
                 <CardContent>
                   <div className="space-y-4">
                     <Link
-                      href="https://github.com/yourusername"
+                      href="https://github.com/tamiopia"
                       className="flex items-center gap-2 text-sm text-gray-300 hover:text-[#f97316] transition-colors"
                     >
                       <Github className="h-5 w-5" />
-                      github.com/yourusername
+                      github.com/tamiopia
                     </Link>
                     <Link
-                      href="https://linkedin.com/in/yourusername"
+                      href="https://linkedin.com/in/tamagn-zewdu"
                       className="flex items-center gap-2 text-sm text-gray-300 hover:text-[#f97316] transition-colors"
                     >
                       <Linkedin className="h-5 w-5" />
-                      linkedin.com/in/yourusername
+                      linkedin.com/in/tamagn-zewdu
                     </Link>
                     <Link
-                      href="mailto:your.email@example.com"
+                      href="https://medium.com/@tamiopia"
                       className="flex items-center gap-2 text-sm text-gray-300 hover:text-[#f97316] transition-colors"
                     >
                       <Mail className="h-5 w-5" />
-                      your.email@example.com
+                      medium.com/@tamiopia
                     </Link>
                   </div>
                 </CardContent>
@@ -181,7 +185,10 @@ export default function ContactPage() {
                   variant="outline"
                   className="border-[#3c3c3c] text-[#f97316] hover:bg-[#f97316] hover:text-white"
                 >
-                  <Link href="/">Back to API Explorer</Link>
+                  <Link href="/portfolio">Back to Classic Portfolio</Link>
+                </Button>
+                <Button asChild className="bg-[#f97316] hover:bg-[#ea580c] text-white">
+                  <Link href="/">Open API Portfolio</Link>
                 </Button>
               </div>
             </div>
